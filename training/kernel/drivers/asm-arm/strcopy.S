@@ -9,6 +9,10 @@ copyloop:
 	cmp	r2,#0		/* Check for NUL terminator */
 	bne	copyloop	/* Repeat loop if not */
 
+	mov	r0,#0x20
+	mov	r1,#0x10
+	bl	c_func
+	bl	c_func
 	mov	pc,lr		/* Return to the caller */
 ENDPROC(strcopy)
 
