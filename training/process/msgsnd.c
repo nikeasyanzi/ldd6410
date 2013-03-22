@@ -17,7 +17,7 @@ int creat_msg_queue()
         struct msqid_ds buffer;
 
         proj_id=2;
-        key=ftok("/home/bhsong",proj_id);
+        key=ftok(getenv("HOME"),proj_id);
         if(key==-1){
                 perror("cannot generate the IPC key");
                 return -1;
