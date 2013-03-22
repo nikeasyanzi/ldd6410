@@ -13,8 +13,10 @@ main(int argc, char** argv)
 	people *p_map;
 	char* name = "/dev/shm/myshm2";
 	key = ftok(name,0);
-	if(key == -1)
+	if(key == -1) {
 		perror("ftok error");
+		exit(-1);
+	}
 	shm_id = shmget(key,4096,/*IPC_CREAT*/0666);	
 	if(shm_id == -1)
 	{
