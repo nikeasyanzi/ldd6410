@@ -25,6 +25,7 @@ main(int argc, char** argv)
 		perror("shmget error");
 		return;
 	}
+
 	p_map=(people*)shmat(shm_id,NULL,0);
 	temp='a';
 	printf("%08x\n", p_map);
@@ -34,9 +35,11 @@ main(int argc, char** argv)
 		memcpy((*(p_map+i)).name,&temp,1);
 		(*(p_map+i)).age=20+i;
 	}
-	while(1);
 	if(shmdt(p_map)==-1)
 		perror(" detach error ");
-//	while(1);
+	sleep(10);
+	system("ipcs");
+	shmctl(shm_id, IPC_RMID, NULL) ;
+	system("ipcs");
 }
 
