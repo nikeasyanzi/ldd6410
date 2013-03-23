@@ -16,10 +16,11 @@ void* thread_fun(void* param)
 	int i;
 	
 	printf("thread pid:%d, tid:%lu\n",getpid(), pthread_self());
-/*	for(i=0;i<p->num;i++){
+	for(i=0;i<p->num;i++){
+		sleep(1);
 		printf("%i: %c\n",i,p->info);
 	}
-*/		
+		
 	return NULL;
 }
 
