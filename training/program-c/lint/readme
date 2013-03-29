@@ -1,0 +1,19 @@
+splint lint-exam.c 
+Splint 3.1.2 --- 03 May 2009
+
+lint-exam.c: (in function main)
+lint-exam.c:10:5: Unrecognized identifier: c
+  Identifier used in code has not been declared. (Use -unrecog to inhibit
+  warning)
+lint-exam.c:11:5: Unrecognized identifier: d
+lint-exam.c:4:6: Variable a declared but not used
+  A variable is declared but never used. Use /*@unused@*/ in front of
+  declaration to suppress message. (Use -varuse to inhibit warning)
+lint-exam.c:1:14: Parameter argc not used
+  A function parameter is not used in the body of the function. If the argument
+  is needed for type compatibility or future plans, use /*@unused@*/ in the
+  argument declaration. (Use -paramuse to inhibit warning)
+lint-exam.c:1:25: Parameter argv not used
+
+Finished checking --- 5 code warnings
+
