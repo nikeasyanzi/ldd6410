@@ -18,6 +18,7 @@ int main(void)
 		pause();
 		_exit(0);
 	} else {
+		while(1);
 		do {
 			wait_pid=waitpid(pid, &status, WUNTRACED | WCONTINUED);
 

@@ -14,7 +14,8 @@ void* thread_fun(void* param)
 	
 	p=(struct thread_param*)param;
 	int i;
-	
+
+	while(1);
 	printf("thread pid:%d, tid:%lu\n",getpid(), pthread_self());
 	for(i=0;i<p->num;i++){
 		sleep(1);

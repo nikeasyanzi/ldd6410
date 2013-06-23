@@ -5,7 +5,7 @@
  * uncomment this to enable main join and ret
  */
 
-//#define MAIN_JOIN
+#define MAIN_JOIN
 //#define MAIN_RET
 
 void* thread_fun(void* param)
