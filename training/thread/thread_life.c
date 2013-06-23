@@ -14,8 +14,9 @@ void* thread_fun(void* param)
 	
 	p=(struct thread_param*)param;
 	int i;
-
+#if 0 /* define 1 to make thread hold 100% cpu */
 	while(1);
+#endif
 	printf("thread pid:%d, tid:%lu\n",getpid(), pthread_self());
 	for(i=0;i<p->num;i++){
 		sleep(1);

@@ -10,6 +10,7 @@ void sigusr1(int sig)
 
 int main(void)
 {
+	/* replace 2 by 9, and prove 9 can't be ignored and blocked */
 	if(signal(2,/*SIG_IGN*/sigusr1)==SIG_ERR){
 		perror("cannot reset the SIGINT signal handler");
 		return 1;
