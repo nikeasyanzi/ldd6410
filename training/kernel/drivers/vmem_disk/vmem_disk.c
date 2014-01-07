@@ -24,7 +24,7 @@
 
 MODULE_LICENSE("Dual BSD/GPL");
 
-static int vmem_disk_major = 0;
+static int vmem_disk_major;
 module_param(vmem_disk_major, int, 0);
 static int hardsect_size = 512;
 module_param(hardsect_size, int, 0);
@@ -49,7 +49,7 @@ module_param(request_mode, int, 0);
  */
 #define vmem_disk_MINORS    16
 #define MINOR_SHIFT     4
-#define DEVNUM(kdevnum) (MINOR(kdev_t_to_nr(kdevnum)) >> MINOR_SHIFT
+#define DEVNUM(kdevnum) ((MINOR(kdev_t_to_nr(kdevnum)) >> MINOR_SHIFT)
 
 	/*
 	 * We can tweak our hardware sector size, but the kernel talks to us
@@ -60,7 +60,7 @@ module_param(request_mode, int, 0);
 	/*
 	 * After this much idle time, the driver will simulate a media change.
 	 */
-#define INVALIDATE_DELAY        30*HZ
+#define INVALIDATE_DELAY        (30*HZ)
 
 	/*
 	 * The internal representation of our device.
@@ -76,7 +76,7 @@ module_param(request_mode, int, 0);
 	struct timer_list timer;        /* For simulated media changes */
 	};
 
-static struct vmem_disk_dev *Devices = NULL;
+static struct vmem_disk_dev *devices;
 
 /*
  * Handle an I/O request.
@@ -95,7 +95,6 @@ static void vmem_disk_transfer(struct vmem_disk_dev *dev, unsigned long sector,
 		memcpy(dev->data + offset, buffer, nbytes);
 	else
 		memcpy(buffer, dev->data + offset, nbytes);
-
 }
 
 /*
@@ -107,7 +106,7 @@ static void vmem_disk_request(struct request_queue *q)
 
 	while ((req = blk_peek_request(q)) != NULL) {
 		struct vmem_disk_dev *dev = req->rq_disk->private_data;
-		if (! blk_fs_request(req)) {
+		if (!blk_fs_request(req)) {
 			printk (KERN_NOTICE "Skip non-fs request\n");
 			blk_start_request(req);
 			__blk_end_request_all(req, -EIO);
@@ -179,7 +178,7 @@ static void vmem_disk_full_request(struct request_queue *q)
 	struct vmem_disk_dev *dev = q->queuedata;
 
 	while ((req = blk_peek_request(q)) != NULL) {
-		if (! blk_fs_request(req)) {
+		if (!blk_fs_request(req)) {
 			blk_start_request(req);
 			printk (KERN_NOTICE "Skip non-fs request\n");
 			__blk_end_request_all(req, -EIO);
@@ -367,7 +366,7 @@ static void setup_device(struct vmem_disk_dev *dev, int which)
 	 * And the gendisk structure.
 	 */
 	dev->gd = alloc_disk(vmem_disk_MINORS);
-	if (! dev->gd) {
+	if (!dev->gd) {
 		printk (KERN_NOTICE "alloc_disk failure\n");
 		goto out_vfree;
 	}
@@ -401,11 +400,11 @@ static int __init vmem_disk_init(void)
 	/*
 	 * Allocate the device array, and initialize each one.
 	 */
-	Devices = kmalloc(ndevices*sizeof (struct vmem_disk_dev), GFP_KERNEL);
-	if (Devices == NULL)
+	devices = kmalloc(ndevices*sizeof (struct vmem_disk_dev), GFP_KERNEL);
+	if (!devices)
 		goto out_unregister;
 	for (i = 0; i < ndevices; i++)
-		setup_device(Devices + i, i);
+		setup_device(devices + i, i);
 
 	return 0;
 
@@ -419,7 +418,7 @@ static void vmem_disk_exit(void)
 	int i;
 
 	for (i = 0; i < ndevices; i++) {
-		struct vmem_disk_dev *dev = Devices + i;
+		struct vmem_disk_dev *dev = devices + i;
 
 		del_timer_sync(&dev->timer);
 		if (dev->gd) {
@@ -437,7 +436,7 @@ static void vmem_disk_exit(void)
 			vfree(dev->data);
 	}
 	unregister_blkdev(vmem_disk_major, "vmem_disk");
-	kfree(Devices);
+	kfree(devices);
 }
 
 module_init(vmem_disk_init);
