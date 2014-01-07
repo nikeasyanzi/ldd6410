@@ -41,7 +41,7 @@ enum {
 	RM_FULL    = 1, /* The full-blown version */
 	RM_NOQUEUE = 2, /* Use make_request */
 };
-static int request_mode = RM_SIMPLE;
+static int request_mode = RM_FULL;
 module_param(request_mode, int, 0);
 
 /*
@@ -95,6 +95,7 @@ static void vmem_disk_transfer(struct vmem_disk_dev *dev, unsigned long sector,
 		memcpy(dev->data + offset, buffer, nbytes);
 	else
 		memcpy(buffer, dev->data + offset, nbytes);
+
 }
 
 /*
@@ -104,18 +105,20 @@ static void vmem_disk_request(struct request_queue *q)
 {
 	struct request *req;
 
-	while ((req = elv_next_request(q)) != NULL) {
+	while ((req = blk_peek_request(q)) != NULL) {
 		struct vmem_disk_dev *dev = req->rq_disk->private_data;
 		if (! blk_fs_request(req)) {
 			printk (KERN_NOTICE "Skip non-fs request\n");
-			end_request(req, 0);
+			blk_start_request(req);
+			__blk_end_request_all(req, -EIO);
 			continue;
 		}
 
-		vmem_disk_transfer(dev, req->sector, req->current_nr_sectors,
+		blk_start_request(req);
+		vmem_disk_transfer(dev, blk_rq_pos(req), blk_rq_cur_sectors(req),
 			req->buffer, rq_data_dir(req));
 
-		end_request(req, 1);
+		__blk_end_request_all(req, 0);
 	}
 }
 
@@ -132,9 +135,9 @@ static int vmem_disk_xfer_bio(struct vmem_disk_dev *dev, struct bio *bio)
 	/* Do each segment independently. */
 	bio_for_each_segment(bvec, bio, i) {
 		char *buffer = __bio_kmap_atomic(bio, i, KM_USER0);
-		vmem_disk_transfer(dev, sector, bio_cur_sectors(bio),
+		vmem_disk_transfer(dev, sector, bio_cur_bytes(bio) >> 9,
 			buffer, bio_data_dir(bio) == WRITE);
-		sector += bio_cur_sectors(bio);
+		sector += bio_cur_bytes(bio) >> 9;
 		__bio_kunmap_atomic(bio, KM_USER0);
 	}
 	return 0; /* Always "succeed" */
@@ -156,9 +159,9 @@ static int vmem_disk_xfer_request(struct vmem_disk_dev *dev, struct request *req
 	rq_for_each_segment(bvec, req, iter) {
 		char *buffer = __bio_kmap_atomic(iter.bio, iter.i, KM_USER0);
 		sector_t sector = iter.bio->bi_sector;
-		vmem_disk_transfer(dev, sector, bio_cur_sectors(iter.bio),
+		vmem_disk_transfer(dev, sector, bio_cur_bytes(iter.bio) >> 9,
 			buffer, bio_data_dir(iter.bio) == WRITE);
-		sector += bio_cur_sectors(iter.bio);
+		sector += bio_cur_bytes(iter.bio) >> 9;
 		__bio_kunmap_atomic(iter.bio, KM_USER0);
 		nsect += iter.bio->bi_size/KERNEL_SECTOR_SIZE;
 	}
@@ -175,14 +178,16 @@ static void vmem_disk_full_request(struct request_queue *q)
 	int sectors_xferred;
 	struct vmem_disk_dev *dev = q->queuedata;
 
-	while ((req = elv_next_request(q)) != NULL) {
+	while ((req = blk_peek_request(q)) != NULL) {
 		if (! blk_fs_request(req)) {
+			blk_start_request(req);
 			printk (KERN_NOTICE "Skip non-fs request\n");
-			end_request(req, 0);
+			__blk_end_request_all(req, -EIO);
 			continue;
 		}
+		blk_start_request(req);
 		sectors_xferred = vmem_disk_xfer_request(dev, req);
-		end_request (req, 1);
+		__blk_end_request_all(req, 0);
 	}
 }
 
@@ -356,7 +361,7 @@ static void setup_device(struct vmem_disk_dev *dev, int which)
 			goto out_vfree;
 		break;
 	}
-	blk_queue_hardsect_size(dev->queue, hardsect_size);
+	blk_queue_logical_block_size(dev->queue, hardsect_size);
 	dev->queue->queuedata = dev;
 	/*
 	 * And the gendisk structure.
