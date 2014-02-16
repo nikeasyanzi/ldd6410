@@ -18,7 +18,7 @@ int main(void)
 		pause();
 		_exit(0);
 	} else {
-#if 0 /* define 1 to make child process always a zomie */
+#if 1 /* define 1 to make child process always a zomie */
 		while(1);
 #endif
 		do {

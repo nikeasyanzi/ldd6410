@@ -14,12 +14,16 @@ void* thread_fun(void* param)
 	
 	p=(struct thread_param*)param;
 	int i;
-#if 0 /* define 1 to make thread hold 100% cpu */
-	while(1);
-#endif
+
+//	while(1);
+
 	printf("thread pid:%d, tid:%lu\n",getpid(), pthread_self());
 	for(i=0;i<p->num;i++){
 		sleep(1);
+/*		if (i==10){
+		 volatile *p=0;
+		 *p=0;
+		}*/
 		printf("%i: %c\n",i,p->info);
 	}
 		
@@ -53,6 +57,7 @@ int main(void)
 		return 1;
 	}
 
+//	while(1);
 	if(pthread_join(tid1,NULL)!=0){
 		perror("call pthread_join function fail");
 		return 1;

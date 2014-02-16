@@ -32,7 +32,7 @@ int main(int argc,char* argv[])
 	num=atoi(argv[1]);
 
 	proj_id=2;
-	key=ftok("/home/sifang",proj_id);
+	key=ftok("/tmp/beijing",proj_id);
 	if(key==-1){
 		perror("cannot generate the IPC key");
 		return -1;

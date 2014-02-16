@@ -10,13 +10,18 @@ void do_at_exit(void)
 
 int main(){
 	int flag;
-
+	printf("hello");
 	flag=atexit(do_at_exit);
 
 	if (flag != 0) {
 		printf("Cannot set exit function\n");
-	 	return EXIT_FAILURE;
+		return EXIT_FAILURE;
 	}
-        
-  	exit(EXIT_SUCCESS);
+
+//	_exit(0);
+	
+//	if(fork() >0)
+//		exit(EXIT_SUCCESS);
+//	else
+//		_exit(1);
 }

@@ -7,7 +7,7 @@ int main(int argc,char* argv[])
 	b[9]=100; /*明显数组越界 */
 
 	/* 用到了两个为声明的变量c和d */
-	   c=100;
-	   d=10;
-	   return 0;
+	c=100;
+	d=10;
+	return 0;
 }
