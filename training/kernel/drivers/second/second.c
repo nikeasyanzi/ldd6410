@@ -8,7 +8,6 @@
 #include <linux/cdev.h>
 #include <linux/slab.h>
 #include <asm/io.h>
-#include <asm/system.h>
 #include <asm/uaccess.h>
 
 #define SECOND_MAJOR 248    /*预设的second的主设备号*/                       

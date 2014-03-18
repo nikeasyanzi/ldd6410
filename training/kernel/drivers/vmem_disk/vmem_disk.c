@@ -106,7 +106,7 @@ static void vmem_disk_request(struct request_queue *q)
 
 	while ((req = blk_peek_request(q)) != NULL) {
 		struct vmem_disk_dev *dev = req->rq_disk->private_data;
-		if (!blk_fs_request(req)) {
+		if (req->cmd_type != REQ_TYPE_FS) {
 			printk (KERN_NOTICE "Skip non-fs request\n");
 			blk_start_request(req);
 			__blk_end_request_all(req, -EIO);
@@ -178,7 +178,7 @@ static void vmem_disk_full_request(struct request_queue *q)
 	struct vmem_disk_dev *dev = q->queuedata;
 
 	while ((req = blk_peek_request(q)) != NULL) {
-		if (!blk_fs_request(req)) {
+		if (req->cmd_type != REQ_TYPE_FS) {
 			blk_start_request(req);
 			printk (KERN_NOTICE "Skip non-fs request\n");
 			__blk_end_request_all(req, -EIO);
@@ -193,14 +193,13 @@ static void vmem_disk_full_request(struct request_queue *q)
 /*
  * The direct make request version.
  */
-static int vmem_disk_make_request(struct request_queue *q, struct bio *bio)
+static void vmem_disk_make_request(struct request_queue *q, struct bio *bio)
 {
 	struct vmem_disk_dev *dev = q->queuedata;
 	int status;
 
 	status = vmem_disk_xfer_bio(dev, bio);
 	bio_endio(bio, status);
-	return 0;
 }
 
 

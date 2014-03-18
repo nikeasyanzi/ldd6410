@@ -16,7 +16,6 @@
 #include <linux/cdev.h>
 #include <linux/slab.h>
 #include <asm/io.h>
-#include <asm/system.h>
 #include <asm/uaccess.h>
 #include <linux/poll.h>
 

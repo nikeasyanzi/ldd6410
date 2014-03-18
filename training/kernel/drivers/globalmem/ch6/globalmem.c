@@ -15,7 +15,6 @@
 #include <linux/cdev.h>
 #include <linux/slab.h>
 #include <asm/io.h>
-#include <asm/system.h>
 #include <asm/uaccess.h>
 
 #define GLOBALMEM_SIZE	0x1000	/*全局内存最大4K字节*/
@@ -44,8 +43,7 @@ int globalmem_release(struct inode *inode, struct file *filp)
 }
 
 /* ioctl设备控制函数 */
-static int globalmem_ioctl(struct inode *inodep, struct file *filp, unsigned
-	int cmd, unsigned long arg)
+static long globalmem_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	struct globalmem_dev *dev = filp->private_data;/*获得设备结构体指针*/
 
@@ -160,7 +158,7 @@ static const struct file_operations globalmem_fops = {
 	.llseek = globalmem_llseek,
 	.read = globalmem_read,
 	.write = globalmem_write,
-	.ioctl = globalmem_ioctl,
+	.unlocked_ioctl = globalmem_ioctl,
 	.open = globalmem_open,
 	.release = globalmem_release,
 };
