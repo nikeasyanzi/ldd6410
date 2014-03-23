@@ -8,7 +8,7 @@ int child_process()
 	printf("Child process %d, data %d\n",getpid(),data);
 	data = 20;
 	printf("Child process %d, data %d\n",getpid(),data);
-//	while(1);
+	while(1);
 }
 
 int main(int argc, char* argv[])
