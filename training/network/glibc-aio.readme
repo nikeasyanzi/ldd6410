@@ -1,0 +1,8 @@
+undefined reference to `aio_write64':
+librt 是glibc对linux下的real-time系统调用的支持接口
+封装的函数包括异步I/O，计时器，共享内存等：
+
+aio_cancel(GLIBC_2.1)[2] aio_suspend(GLIBC_2.1)[2] lio_listio64(GLIBC_2.1)[1] aio_cancel64(GLIBC_2.1)[1] aio_suspend64(GLIBC_2.1)[1] shm_open(GLIBC_2.1)[2] aio_error(GLIBC_2.1)[2] aio_write(GLIBC_2.1)[2] shm_unlink(GLIBC_2.1)[2] aio_error64(GLIBC_2.1)[1] aio_write64(GLIBC_2.1)[1] timer_create(GLIBC_2.1)[2] aio_fsync(GLIBC_2.1)[2] clock_getcpuclockid(GLIBC_2.1)[2] timer_delete(GLIBC_2.1)[2] aio_fsync64(GLIBC_2.1)[1] clock_getres(GLIBC_2.1)[2] timer_getoverrun(GLIBC_2.1)[2] aio_read(GLIBC_2.1)[2] clock_gettime(GLIBC_2.1)[2] timer_gettime(GLIBC_2.1)[2] aio_read64(GLIBC_2.1)[1] clock_nanosleep(GLIBC_2.1)[2] timer_settime(GLIBC_2.1)[2] aio_return(GLIBC_2.1)[2] clock_settime(GLIBC_2.1)[2] aio_return64(GLIBC_2.1)[1] lio_listio(GLIBC_2.1)[2]
+
+当程序中使用到上述函数时， 除要包含相应的头文件，在链接时要引用该库文件：
+     gcc sample.c -lrt 

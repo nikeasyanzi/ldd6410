@@ -60,12 +60,14 @@ void AIO_write()
 		}
 
 		struct aiocb *cblist[1] = {&stAio};
+		/* 查看一个异步请求的状态（进行中EINPROGRESS？还是已经结束或出错？）*/
 		ret = aio_error(&stAio);
 
 		if (ret == 0) {
 			// already completed
 		}
 		else if (ret == EINPROGRESS) {
+			/* 阻塞等待请求完成 */
 			if (aio_suspend((const struct aiocb *const*)cblist, 1, NULL))
 			{
 				perror("aio_suspend error:");
@@ -76,6 +78,7 @@ void AIO_write()
 			perror("aio_error error:");
 			return;
 		}
+		/* 查看一个异步请求的返回值（跟同步读写定义的一样） */
 		if (aio_return(&stAio) != DATA_LEN)
 		{
 			perror("aio_return error:");
@@ -86,28 +89,31 @@ void AIO_write()
 
 void AIO_read(void)
 {
-    int fd, ret;
-    struct aiocb my_aiocb;
+	int fd, ret;
+	struct aiocb my_aiocb;
 
 #define BUFF_SIZE (1024 * 1024 * 20)
-    fd = open("aio_write.dat", O_RDONLY);
-    if (fd < 0) perror("open");
+	fd = open("aio_write.dat", O_RDONLY);
+	if (fd < 0) perror("open");
 
-    bzero((char *)&my_aiocb, sizeof(struct aiocb));
-    my_aiocb.aio_buf = malloc(BUFF_SIZE + 1);
-    if (!my_aiocb.aio_buf) perror("malloc");
+	bzero((char *)&my_aiocb, sizeof(struct aiocb));
+	my_aiocb.aio_buf = malloc(BUFF_SIZE + 1);
+	if (!my_aiocb.aio_buf) perror("malloc");
 
-    my_aiocb.aio_fildes = fd;
-    my_aiocb.aio_nbytes = BUFF_SIZE;
-    my_aiocb.aio_offset = 0;
+	my_aiocb.aio_fildes = fd;
+	my_aiocb.aio_nbytes = BUFF_SIZE;
+	my_aiocb.aio_offset = 0;
 
-    ret = aio_read(&my_aiocb);
-    if (ret < 0) perror("aio_read");
+	ret = aio_read(&my_aiocb);
+	if (ret < 0) perror("aio_read");
 
-    while (aio_error(&my_aiocb) == EINPROGRESS);
+	/*
+	 * 查看一个异步请求的状态（进行中EINPROGRESS？还是已经结束或出错？
+	 */
+	while (aio_error(&my_aiocb) == EINPROGRESS);
 
-    if ((ret = aio_return(&my_aiocb)) <= 0)
-        printf("read failed\n");
+	if ((ret = aio_return(&my_aiocb)) <= 0)
+		printf("read failed\n");
 }
 
 main()
