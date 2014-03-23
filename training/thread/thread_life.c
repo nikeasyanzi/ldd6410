@@ -15,7 +15,7 @@ void* thread_fun(void* param)
 	p=(struct thread_param*)param;
 	int i;
 
-//	while(1);
+	while(1);
 
 	printf("thread pid:%d, tid:%lu\n",getpid(), pthread_self());
 	for(i=0;i<p->num;i++){
@@ -57,7 +57,7 @@ int main(void)
 		return 1;
 	}
 
-//	while(1);
+	while(1);
 	if(pthread_join(tid1,NULL)!=0){
 		perror("call pthread_join function fail");
 		return 1;
