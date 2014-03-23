@@ -14,6 +14,9 @@ void echomsg(int t)
 {
         printf("destructor excuted in thread %d,param=%d\n",pthread_self(),t);
 }
+
+__thread int test = 123;
+
 void * child1(void *arg)
 {
         int tid=pthread_self();
@@ -22,7 +25,12 @@ void * child1(void *arg)
         sleep(2);
         printf("thread %d returns %d\n",tid,pthread_getspecific(key));
         sleep(5);
+
+	test = 345;
+
+        printf("thread %d test %d\n",tid, test);
 }
+
 void * child2(void *arg)
 {
         int tid=pthread_self();
@@ -30,16 +38,19 @@ void * child2(void *arg)
         pthread_setspecific(key,(void *)tid);
         sleep(1);
         printf("thread %d returns %d\n",tid,pthread_getspecific(key));
-        sleep(5);
+        sleep(10);
+
+        printf("thread %d test %d\n",tid, test);
 }
+
 int main(void)
 {
         int tid1,tid2;
         printf("hello\n");
-        pthread_key_create(&key,echomsg);
+        pthread_key_create(&key, echomsg);
         pthread_create(&tid1,NULL,child1,NULL);
         pthread_create(&tid2,NULL,child2,NULL);
-        sleep(10);
+        sleep(20);
         pthread_key_delete(key);
         printf("main thread exit\n");
         return 0;
