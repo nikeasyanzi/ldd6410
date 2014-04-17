@@ -20,10 +20,10 @@ void* thread_fun(void* param)
 	printf("thread pid:%d, tid:%lu\n",getpid(), pthread_self());
 	for(i=0;i<p->num;i++){
 		sleep(1);
-/*		if (i==10){
+		if (i==10){
 		 volatile *p=0;
 		 *p=0;
-		}*/
+		}
 		printf("%i: %c\n",i,p->info);
 	}
 		
@@ -58,6 +58,8 @@ int main(void)
 	}
 
 	while(1);
+
+#if 1
 	if(pthread_join(tid1,NULL)!=0){
 		perror("call pthread_join function fail");
 		return 1;
@@ -67,5 +69,6 @@ int main(void)
 		perror("call pthread_join function fail");
 		return 1;
 	}
+#endif
 	return 0;
 }	

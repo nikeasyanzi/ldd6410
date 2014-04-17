@@ -24,6 +24,8 @@
 #define FIFO_CLEAR 0x1  /*清0全局内存的长度*/
 #define GLOBALFIFO_MAJOR 249    /*预设的globalfifo的主设备号*/
 
+static DEFINE_MUTEX(round_robin_lock);
+
 static int globalfifo_major = GLOBALFIFO_MAJOR;
 /*globalfifo设备结构体*/
 struct globalfifo_dev {
@@ -49,6 +51,7 @@ int globalfifo_open(struct inode *inode, struct file *filp)
 {
 	/*将设备结构体指针赋值给文件私有数据指针*/
 	filp->private_data = globalfifo_devp;
+	mutex_lock(&round_robin_lock);
 	return 0;
 }
 /*文件释放函数*/
@@ -56,6 +59,7 @@ int globalfifo_release(struct inode *inode, struct file *filp)
 {
 	/* 将文件从异步通知列表中删除 */ 
 	globalfifo_fasync( - 1, filp, 0);
+	mutex_unlock(&round_robin_lock);
 	return 0;
 }
 

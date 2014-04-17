@@ -20,8 +20,8 @@ int main(){
 
 //	_exit(0);
 	
-//	if(fork() >0)
-//		exit(EXIT_SUCCESS);
-//	else
-//		_exit(1);
+	if(fork() >0)
+		exit(EXIT_SUCCESS);
+	else
+		exit(1);
 }

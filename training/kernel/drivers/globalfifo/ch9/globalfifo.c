@@ -59,7 +59,7 @@ int globalfifo_release(struct inode *inode, struct file *filp)
 }
 
 /* ioctl设备控制函数 */
-static int globalfifo_ioctl(struct inode *inodep, struct file *filp, unsigned
+static long globalfifo_ioctl(struct file *filp, unsigned
 		int cmd, unsigned long arg)
 {
 	struct globalfifo_dev *dev = filp->private_data;/*获得设备结构体指针*/
@@ -114,7 +114,7 @@ static ssize_t globalfifo_read(struct file *filp, char __user *buf, size_t count
 	add_wait_queue(&dev->r_wait, &wait); /* 进入读等待队列头 */
 
 	/* 等待FIFO非空 */
-	if (dev->current_len == 0) {
+	while (dev->current_len == 0) {
 		if (filp->f_flags &O_NONBLOCK) {
 			ret =  - EAGAIN;
 			goto out;
@@ -168,7 +168,7 @@ static ssize_t globalfifo_write(struct file *filp, const char __user *buf,
 	add_wait_queue(&dev->w_wait, &wait);
 
 	/* 等待FIFO非满 */
-	if (dev->current_len == GLOBALFIFO_SIZE) {
+	while (dev->current_len == GLOBALFIFO_SIZE) {
 		if (filp->f_flags &O_NONBLOCK) {
 			ret =  - EAGAIN;
 			goto out;
@@ -222,7 +222,7 @@ static const struct file_operations globalfifo_fops = {
 	.owner = THIS_MODULE,
 	.read = globalfifo_read,
 	.write = globalfifo_write,
-	.ioctl = globalfifo_ioctl,
+	.unlocked_ioctl = globalfifo_ioctl,
 	.poll = globalfifo_poll,
 	.fasync = globalfifo_fasync,
 	.open = globalfifo_open,
@@ -267,7 +267,7 @@ int globalfifo_init(void)
 
 	globalfifo_setup_cdev(globalfifo_devp, 0);
 
-	init_MUTEX(&globalfifo_devp->sem);   /*初始化信号量*/
+	sema_init(&globalfifo_devp->sem, 1);   /*初始化信号量*/
 	init_waitqueue_head(&globalfifo_devp->r_wait); /*初始化读等待队列头*/
 	init_waitqueue_head(&globalfifo_devp->w_wait); /*初始化写等待队列头*/
 

@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#define DUP_STDIO
+
 static void zap_stdio(void)
 {
 	int fd;
