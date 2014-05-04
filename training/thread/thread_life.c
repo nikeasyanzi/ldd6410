@@ -15,15 +15,15 @@ void* thread_fun(void* param)
 	p=(struct thread_param*)param;
 	int i;
 
-	while(1);
-
 	printf("thread pid:%d, tid:%lu\n",getpid(), pthread_self());
 	for(i=0;i<p->num;i++){
 		sleep(1);
+	#if 1
 		if (i==10){
 		 volatile *p=0;
 		 *p=0;
 		}
+	#endif
 		printf("%i: %c\n",i,p->info);
 	}
 		
@@ -56,8 +56,6 @@ int main(void)
 		perror("cannot create new thread");
 		return 1;
 	}
-
-	while(1);
 
 #if 1
 	if(pthread_join(tid1,NULL)!=0){

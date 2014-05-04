@@ -1,35 +1,46 @@
+BIN = test
 CC = gcc
+INCS =
+LIBS =
+SUBDIRS = main init
+#
+#
+#所有的源文件--  .c文件列表
+SRCS = $(wildcard *.c ./main/*.c ./init/*.c)
+#
+#所有的.o文件列表
+OBJS =$(SRCS:.c=.o)
 
-RDIR = Rels
-MAIN_DIR = main/Rels
-INIT_DIR = init/Rels
+#
+#生成依赖信息
+MAKEDEPEND = gcc -MM    
+CFLAGS = $(INCS)
+                    
+all: $(BIN)
 
-OBJ_FILES = $(MAIN_DIR)/main.o \
-     $(INIT_DIR)/init1.o $(INIT_DIR)/init2.o $(INIT_DIR)/init3.o $(INIT_DIR)/init4.o
+#生成.o的对自己目录中.h .c的依赖信息到.depend文件中
+.depend:
+	$(MAKEDEPEND) $(SRCS) > $@
 
-#build dest
-$(RDIR)/dest: $(RDIR) $(MAIN_DIR) $(INIT_DIR) $(OBJ_FILES)
-	$(CC) $(OBJ_FILES) -o $@
+#重新生成依赖信息
+depend:
+	rm .depend
+	$(MAKE) .depend
 
-# make directry
-$(MAIN_DIR):
-	mkdir $(MAIN_DIR)
+$(OBJS) : %.o:%.c
+	$(CC) -c $< -o $@ $(CFLAGS)
 
-$(RDIR):
-	mkdir $(RDIR)
-   
-$(INIT_DIR):
-	mkdir $(INIT_DIR)
+$(BIN) : $(OBJS)
+	$(CC) -o $(BIN) $(OBJS) $(LIBS)
 
-#compile object
-$(MAIN_DIR)/main.o: main/main.c
-	$(CC) -c -o $@ $^
+#引入了.o文件对.c和.h的依赖情况。以后.h被修改也会重新make
+include .depend    
+.PHONY:clean cleanall
 
-$(INIT_DIR)/%.o: init/%.c
-	$(CC) -c -o $@ $^
+#清除所有目标文件以及生成的最终目标文件
+clean:            
+	rm $(BIN) $(OBJS)
 
-#clean all
-clean:
-	rm -r -f $(RDIR)
-	rm -r -f $(INIT_DIR)
-	rm -r -f $(MAIN_DIR)
+cleanall:
+	rm .depend
+	rm $(BIN) $(OBJS)
