@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 #由反引号括起来的也是一条命令，Shell先执行该命令，然后将输出结果立刻代换到当前命令行中。例如定义一个变量存放date命令的输出：
 echo `date`
 #命令代换也可以用$()表示：
@@ -66,6 +66,14 @@ case "$YES_OR_NO" in
 	exit 1;;
 esac
 
+#利用循环计算10的阶乘
+factorial=1
+for a in `seq 1 10`
+do
+       factorial=`expr $factorial \* $a`
+done
+echo "10! = $factorial"
+
 #FRUIT是一个循环变量，第一次循环$FRUIT的取值是apple，第二次取值是banana，第三次取值是pear
 for FRUIT in apple banana pear; do
 	  echo "I like $FRUIT"
@@ -90,7 +98,7 @@ echo "The program $0 is now running"
 #$1、$2...	这些称为位置参数（Positional Parameter），相当于C语言main函数的argv[1]、argv[2]...
 echo "The first parameter is $1"
 echo "The second parameter is $2"
-$@	表示参数列表"$1" "$2" ...，例如可以用在for循环中的in后面
+#$@	表示参数列表"$1" "$2" ...，例如可以用在for循环中的in后面
 for PARAM in $@; do
 	echo "PARAM $PARAM"
 done
@@ -128,3 +136,17 @@ for DIR in "$@"; do
 		fi
 	fi
 done
+
+multiple_times()
+{
+	result=1
+	while [ $# -gt 0 ]
+	do
+		result=$(($result * $1))
+     		shift
+	done
+	return $result
+}
+
+multiple_times 22 35 76
+echo return value: $?
