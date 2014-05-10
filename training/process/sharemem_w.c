@@ -37,7 +37,7 @@ main(int argc, char** argv)
 	}
 	if(shmdt(p_map)==-1)
 		perror(" detach error ");
-///	sleep(100);
+	sleep(100);
 	system("ipcs");
 	shmctl(shm_id, IPC_RMID, NULL) ;
 

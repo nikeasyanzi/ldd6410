@@ -71,6 +71,7 @@ int main()
 	sigemptyset(&bset);
 	sigaddset(&bset, SIGRTMIN);
 	sigaddset(&bset, SIGUSR1);
+	//A new thread inherits a copy of its creator's signal mask.
 	if (pthread_sigmask(SIG_BLOCK, &bset, &oset) != 0)
 		printf("!! Set pthread mask failed\n");
 
