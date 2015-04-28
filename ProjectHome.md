@@ -1,0 +1,2 @@
+LDD6410 is a board based on S3C6410 ARM11 SoC. The project provides toolchain, source codes of uboot, Linux kernel, rootfs and applications for this board.
+<p><img src='http://www.linuxdriver.cn/ldd6410.gif' align='middle' /> </p>
